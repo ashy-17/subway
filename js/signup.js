@@ -101,7 +101,7 @@ function togglePassword(fieldId) {
         
         // Redirect after 2 seconds
         setTimeout(function() {
-          window.location.href = 'login.html';
+          window.location.href = 'index.html';
         }, 2000);
       }
     });

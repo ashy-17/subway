@@ -293,7 +293,7 @@ class LogoutModal {
     profileDropdown.close();
     
     // Redirect to login page
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   }
 }
 
