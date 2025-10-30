@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Locations | Subway Philippines</title>
+  <link rel="icon" type="image/png" href="pictures/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/location.css">
+  <!-- Leaflet CSS and JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body class="font-poppins bg-gray-50">
+  <!-- Shopping Cart Sidebar -->
+  <div id="cart-overlay" class="cart-overlay fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+  
+  <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
+    <!-- Cart Header -->
+    <div class="bg-subway-green text-white p-6 flex justify-between items-center">
+      <h2 class="text-2xl font-bold">Your Cart</h2>
+      <button id="close-cart" class="text-white hover:text-subway-yellow transition-colors duration-200">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+    </div>
+    
+    <!-- Cart Items -->
+    <div class="p-6" id="cart-items">
+      <!-- Cart items will be dynamically inserted here -->
+      <div class="text-center py-8" id="empty-cart-message">
+        <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+        <p class="text-gray-500 text-lg">Your cart is empty</p>
+        <p class="text-gray-400">Add some delicious items to get started!</p>
+      </div>
+    </div>
+    
+    <!-- Cart Footer -->
+    <div class="border-t border-gray-200 p-6 mt-auto">
+      <div class="flex justify-between items-center mb-4">
+        <span class="text-lg font-semibold text-gray-700">Subtotal:</span>
+        <span class="text-xl font-bold text-subway-green" id="cart-subtotal">₱0</span>
+      </div>
+      <div class="flex justify-between items-center mb-6">
+        <span class="text-sm text-gray-500">Delivery fee:</span>
+        <span class="text-sm text-gray-500" id="delivery-fee">₱40</span>
+      </div>
+      <div class="flex justify-between items-center mb-6">
+        <span class="text-lg font-bold text-gray-800">Total:</span>
+        <span class="text-xl font-bold text-subway-green" id="cart-total">₱40</span>
+      </div>
+      <button id="checkout-btn" class="w-full bg-subway-green text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Proceed to Checkout
+      </button>
+      <button id="continue-shopping" class="w-full border border-subway-green text-subway-green py-3 rounded-xl font-bold mt-3 hover:bg-gray-50 transition-colors duration-300">
+        Continue Shopping
+      </button>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-center mb-6">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-sign-out-alt text-red-500 text-2xl"></i>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Logout Confirmation</h3>
+        <p class="text-gray-600 text-lg text-center mb-8">Are you sure you want to logout?</p>
+        <div class="flex space-x-4">
+          <button id="cancel-logout" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors duration-300">
+            Cancel
+          </button>
+          <button id="confirm-logout" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-colors duration-300">
+            Yes, Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-lg sticky top-0 z-40">
+    <div class="px-6 py-4 flex justify-between items-center">
+      <!-- Logo and Brand - LEFT -->
+      <div class="flex items-center">
+        <img src="pictures/logo.png" alt="Subway Logo" class="h-14 mr-3">
+        <h1 class="font-bold text-3xl text-subway-green uppercase">
+          SUB<span class="text-subway-yellow">WAY</span>
+        </h1>
+      </div>
+      
+      <!-- Desktop Navigation - CENTER -->
+      <nav class="hidden md:flex space-x-10">
+        <a href="home.html" class="text-xl font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Home</a>
+        <a href="menu.html" class="text-xl font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Menu</a>
+        <a href="promo.html" class="text-xl font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Promos</a>
+        <a href="location.html" class="text-xl font-bold text-subway-green border-b-4 border-subway-green pb-2 transition-all duration-300 hover:scale-105">Location</a>
+      </nav>
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-600 text-2xl hover:text-subway-green transition-colors" id="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Icons - RIGHT -->
+      <div class="flex items-center space-x-6">
+        <a href="notification.html" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110 relative" id="notification-btn">
+          <i class="fas fa-bell text-2xl"></i>
+          <span class="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center">5</span>
+        </a>
+        <button id="cart-btn" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110 relative">
+          <i class="fas fa-shopping-cart text-2xl"></i>
+          <span class="absolute -top-2 -right-2 bg-subway-green text-white text-sm rounded-full w-6 h-6 flex items-center justify-center" id="cart-count">0</span>
+        </button>
+        
+        <!-- Profile Dropdown Container -->
+        <div class="relative" id="profile-container">
+          <button id="profile-btn" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110">
+            <i class="fas fa-user text-2xl"></i>
+          </button>
+          
+          <!-- Profile Dropdown Menu -->
+          <div id="profile-dropdown" class="profile-dropdown absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+            <!-- User Info -->
+            <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-subway-green to-green-600 text-white">
+              <div class="flex items-center">
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-subway-green mr-3">
+                  <i class="fas fa-user text-xl"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg">John Doe</h3>
+                  <p class="text-green-100 text-sm">john.doe@example.com</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dropdown Items -->
+            <div class="py-2">
+              <a href="profile.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <i class="fas fa-user-circle text-subway-green w-6 mr-3 text-center"></i>
+                <span class="font-medium">My Profile</span>
+              </a>
+              <a href="forgot-password.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <i class="fas fa-key text-subway-green w-6 mr-3 text-center"></i>
+                <span class="font-medium">Forgot Password</span>
+              </a>
+              <div class="border-t border-gray-100 my-2"></div>
+              <button id="logout-btn" class="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-50 transition-colors duration-200">
+                <i class="fas fa-sign-out-alt w-6 mr-3 text-center"></i>
+                <span class="font-medium">Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden bg-white border-t border-gray-200 hidden" id="mobile-menu">
+      <nav class="flex flex-col p-6 space-y-4">
+        <a href="home.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Home</a>
+        <a href="menu.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Menu</a>
+        <a href="promo.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Promos</a>
+        <a href="location.html" class="text-xl font-bold text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Location</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- LOCATIONS SECTION -->
+  <section class="py-12 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-4xl md:text-5xl font-bold text-subway-green mb-4">Find a Subway in the Philippines</h2>
+        <p class="text-gray-600 text-xl">Discover our stores across the Philippines and enjoy fresh sandwiches</p>
+      </div>
+      
+      <!-- Search Bar -->
+      <div class="max-w-3xl mx-auto mb-12">
+        <div class="relative">
+          <input 
+            type="text" 
+            placeholder="Search by city, mall, or address..." 
+            class="w-full py-4 px-6 pr-12 rounded-full border border-gray-300 focus:outline-none focus:border-subway-green text-lg search-input"
+            id="location-search"
+          >
+          <button class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-subway-green text-white p-2 rounded-full hover:bg-green-700 transition">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="max-w-3xl mx-auto mb-12 flex gap-4 justify-center">
+        <button onclick="useMyLocation()" class="flex items-center bg-subway-green text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 transition">
+            <i class="fas fa-location-arrow mr-2"></i>
+            Use My Location
+        </button>
+        
+        <button onclick="resetMap()" class="flex items-center bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-300 transition">
+            <i class="fas fa-sync-alt mr-2"></i>
+            Reset Map
+        </button>
+        
+        <button onclick="showAllLocations()" class="flex items-center bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-lg hover:bg-gray-300 transition">
+            <i class="fas fa-eye mr-2"></i>
+            Show All Stores
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Map Section -->
+        <div class="lg:col-span-2">
+          <!-- Map Container -->
+          <div id="map" class="map-container"></div>
+        </div>
+        
+        <!-- Nearby Locations List -->
+        <div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-6">Popular Locations</h3>
+          
+          <div class="location-list space-y-6 max-h-[600px] overflow-y-auto pr-2">
+            <!-- Location 1 - Manila -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway SM Mall of Asia</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>SM Mall of Asia, Pasay City, Metro Manila</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(02) 8556-7890</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>10:00 AM - 9:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">2.3 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 2 - Makati -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway Greenbelt Makati</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>Greenbelt 5, Ayala Center, Makati City</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(02) 8752-3456</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>9:00 AM - 10:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">4.7 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 3 - BGC -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway Bonifacio Global City</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>Bonifacio High Street, Taguig City</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(02) 8876-5432</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>8:00 AM - 11:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">6.1 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 4 - Quezon City -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway Trinoma</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>Trinoma Mall, Quezon City</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(02) 8901-2345</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>10:00 AM - 9:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">8.5 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 5 - Cebu -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway Ayala Center Cebu</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>Ayala Center Cebu, Cebu City</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(032) 412-3456</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>9:00 AM - 9:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">572 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 6 - Davao -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway Abreeza Mall Davao</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>Abreeza Mall, Davao City</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(082) 285-6789</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>10:00 AM - 8:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">974 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 7 - Iloilo -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway SM City Iloilo</h4>
+                <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">Closed</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>SM City Iloilo, Iloilo City</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(033) 509-8765</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>Opens at 10:00 AM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">463 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Location 8 - Pampanga -->
+            <div class="location-card bg-white p-6 rounded-lg shadow-md border border-gray-100">
+              <div class="flex justify-between items-start mb-3">
+                <h4 class="text-xl font-bold text-subway-green">Subway SM Clark</h4>
+                <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">Open</span>
+              </div>
+              <div class="flex items-center text-gray-600 mb-2">
+                <i class="fas fa-map-marker-alt mr-2 text-subway-green"></i>
+                <p>SM City Clark, Pampanga</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-3">
+                <i class="fas fa-phone mr-2 text-subway-green"></i>
+                <p>(045) 499-0123</p>
+              </div>
+              <div class="flex items-center text-gray-600 mb-4">
+                <i class="fas fa-clock mr-2 text-subway-green"></i>
+                <p>9:00 AM - 9:00 PM</p>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">82 km away</span>
+                <div class="flex space-x-2">
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-directions"></i>
+                  </button>
+                  <button class="text-subway-green hover:text-green-700">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-800 text-white py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12 max-w-6xl mx-auto">
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">About Subway</h4>
+          <ul class="space-y-3">
+            <li><a href="story.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Our Story</a></li>
+            <li><a href="nutrition.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Nutrition Information</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Customer Service</h4>
+          <ul class="space-y-3">
+            <li><a href="contact.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Contact Us</a></li>
+            <li><a href="FAS.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Ways to Order</h4>
+          <ul class="space-y-3">
+            <li><a href="Delivery.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Delivery</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Connect With Us</h4>
+          <div class="flex space-x-4 mb-6">
+            <a href="https://www.facebook.com/subwayphilippines/" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-subway-green transition-all duration-300 hover:scale-110">
+              <i class="fab fa-facebook-f text-xl"></i>
+            </a>
+            <a href="https://www.instagram.com/subwayphilippines/?hl=en" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-subway-green transition-all duration-300 hover:scale-110">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-gray-700 text-center text-gray-400">
+        <p class="text-lg">© 2024 Subway® IP LLC. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/location.js"></script>
+</body>
+</html>

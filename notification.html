@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subway | Notifications</title>
+  <link rel="icon" type="image/png" href="pictures/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/notification.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'subway-green': '#009639',
+            'subway-yellow': '#FBCE07',
+          },
+          fontFamily: {
+            'poppins': ['Poppins', 'sans-serif'],
+          },
+          animation: {
+            'slideInRight': 'slideInRight 0.3s ease-out forwards',
+            'slideOutRight': 'slideOutRight 0.3s ease-in forwards',
+          },
+          keyframes: {
+            slideInRight: {
+              '0%': { transform: 'translateX(100%)' },
+              '100%': { transform: 'translateX(0)' },
+            },
+            slideOutRight: {
+              '0%': { transform: 'translateX(0)' },
+              '100%': { transform: 'translateX(100%)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="font-poppins bg-gray-50">
+  <!-- Shopping Cart Sidebar -->
+  <div id="cart-overlay" class="cart-overlay fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+  
+  <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
+    <!-- Cart Header -->
+    <div class="bg-subway-green text-white p-6 flex justify-between items-center">
+      <h2 class="text-2xl font-bold">Your Cart</h2>
+      <button id="close-cart" class="text-white hover:text-subway-yellow transition-colors duration-200">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+    </div>
+    
+    <!-- Cart Items -->
+    <div class="p-6" id="cart-items">
+      <!-- Cart items will be dynamically inserted here -->
+      <div class="text-center py-8" id="empty-cart-message">
+        <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+        <p class="text-gray-500 text-lg">Your cart is empty</p>
+        <p class="text-gray-400">Add some delicious items to get started!</p>
+      </div>
+    </div>
+    
+    <!-- Cart Footer -->
+    <div class="border-t border-gray-200 p-6 mt-auto">
+      <div class="flex justify-between items-center mb-4">
+        <span class="text-lg font-semibold text-gray-700">Subtotal:</span>
+        <span class="text-xl font-bold text-subway-green" id="cart-subtotal">₱0</span>
+      </div>
+      <div class="flex justify-between items-center mb-6">
+        <span class="text-sm text-gray-500">Delivery fee:</span>
+        <span class="text-sm text-gray-500" id="delivery-fee">₱40</span>
+      </div>
+      <div class="flex justify-between items-center mb-6">
+        <span class="text-lg font-bold text-gray-800">Total:</span>
+        <span class="text-xl font-bold text-subway-green" id="cart-total">₱40</span>
+      </div>
+      <button id="checkout-btn" class="w-full bg-subway-green text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Proceed to Checkout
+      </button>
+      <button id="continue-shopping" class="w-full border border-subway-green text-subway-green py-3 rounded-xl font-bold mt-3 hover:bg-gray-50 transition-colors duration-300">
+        Continue Shopping
+      </button>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-center mb-6">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-sign-out-alt text-red-500 text-2xl"></i>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Logout Confirmation</h3>
+        <p class="text-gray-600 text-lg text-center mb-8">Are you sure you want to logout?</p>
+        <div class="flex space-x-4">
+          <button id="cancel-logout" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors duration-300">
+            Cancel
+          </button>
+          <button id="confirm-logout" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-colors duration-300">
+            Yes, Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-lg sticky top-0 z-40">
+    <div class="px-6 py-4 flex justify-between items-center">
+      <!-- Logo and Brand - LEFT -->
+      <div class="flex items-center">
+        <img src="pictures/logo.png" alt="Subway Logo" class="h-10 mr-3">
+        <h1 class="font-bold text-2xl text-subway-green uppercase">
+          SUB<span class="text-subway-yellow">WAY</span>
+        </h1>
+      </div>
+      
+      <!-- Desktop Navigation - CENTER -->
+      <nav class="hidden md:flex space-x-10">
+        <a href="home.html" class="text-lg font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Home</a>
+        <a href="menu.html" class="text-lg font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Menu</a>
+        <a href="promo.html" class="text-lg font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Promos</a>
+        <a href="location.html" class="text-lg font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Location</a>
+      </nav>
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-600 text-2xl hover:text-subway-green transition-colors" id="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Icons - RIGHT -->
+      <div class="flex items-center space-x-6">
+        <a href="notification.html" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110 relative" id="notification-btn">
+          <i class="fas fa-bell text-xl"></i>
+          <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="notification-count">5</span>
+        </a>
+        <button id="cart-btn" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110 relative">
+          <i class="fas fa-shopping-cart text-xl"></i>
+          <span class="absolute -top-2 -right-2 bg-subway-green text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="cart-count">0</span>
+        </button>
+        
+        <!-- Profile Dropdown Container -->
+        <div class="relative" id="profile-container">
+          <button id="profile-btn" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110">
+            <i class="fas fa-user text-xl"></i>
+          </button>
+          
+          <!-- Profile Dropdown Menu -->
+          <div id="profile-dropdown" class="profile-dropdown absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+            <!-- User Info -->
+            <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-subway-green to-green-600 text-white">
+              <div class="flex items-center">
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-subway-green mr-3">
+                  <i class="fas fa-user text-xl"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg">Mark John C. Cruz</h3>
+                  <p class="text-green-100 text-sm">mark.cruz@example.com</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dropdown Items -->
+            <div class="py-2">
+              <a href="profile.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <i class="fas fa-user-circle text-subway-green w-6 mr-3 text-center"></i>
+                <span class="font-medium">My Profile</span>
+              </a>
+              <a href="forgot-password.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <i class="fas fa-key text-subway-green w-6 mr-3 text-center"></i>
+                <span class="font-medium">Forgot Password</span>
+              </a>
+              <div class="border-t border-gray-100 my-2"></div>
+              <button id="logout-btn" class="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-50 transition-colors duration-200">
+                <i class="fas fa-sign-out-alt w-6 mr-3 text-center"></i>
+                <span class="font-medium">Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden bg-white border-t border-gray-200 hidden" id="mobile-menu">
+      <nav class="flex flex-col p-6 space-y-4">
+        <a href="home.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Home</a>
+        <a href="menu.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Menu</a>
+        <a href="promo.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Promos</a>
+        <a href="location.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 hover:bg-gray-50 rounded-lg px-4 transition-all">Location</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- NOTIFICATIONS SECTION -->
+  <section class="py-12">
+    <div class="container mx-auto px-4 max-w-6xl">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-subway-green mb-4">Notifications</h2>
+        <p class="text-lg text-gray-600">Stay updated with your orders and promotions</p>
+      </div>
+      
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+        <!-- Header with Filters and Actions -->
+        <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+            <!-- Filter Options -->
+            <div class="flex flex-wrap gap-2">
+              <button class="filter-btn active px-4 py-2 font-medium transition-all duration-300 flex items-center" data-category="all">
+                <i class="fas fa-inbox mr-2"></i>
+                <span>All</span>
+                <span class="ml-2 bg-subway-green text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">15</span>
+              </button>
+              
+              <button class="filter-btn px-4 py-2 font-medium transition-all duration-300 flex items-center" data-category="unread">
+                <i class="fas fa-envelope mr-2"></i>
+                <span>Unread</span>
+                <span class="ml-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">5</span>
+              </button>
+              
+              <button class="filter-btn px-4 py-2 font-medium transition-all duration-300 flex items-center" data-category="orders">
+                <i class="fas fa-shopping-bag mr-2"></i>
+                <span>Orders</span>
+                <span class="ml-2 bg-blue-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">8</span>
+              </button>
+              
+              <button class="filter-btn px-4 py-2 font-medium transition-all duration-300 flex items-center" data-category="promotions">
+                <i class="fas fa-tag mr-2"></i>
+                <span>Promotions</span>
+                <span class="ml-2 bg-yellow-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">7</span>
+              </button>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-2">
+              <button id="mark-all-read" class="px-4 py-2 bg-subway-green text-white rounded-lg font-medium transition-all duration-300 hover:bg-green-700 flex items-center text-sm">
+                <i class="fas fa-check-circle mr-2"></i>
+                Mark All as Read
+              </button>
+              <button id="clear-all" class="px-4 py-2 bg-red-500 text-white rounded-lg font-medium transition-all duration-300 hover:bg-red-600 flex items-center text-sm">
+                <i class="fas fa-trash-alt mr-2"></i>
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notifications List -->
+        <div class="divide-y divide-gray-200 max-h-[500px] overflow-y-auto" id="notifications-list">
+          <!-- Notifications will be populated here -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden p-12 text-center">
+          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-bell-slash text-3xl text-gray-400"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-700 mb-2">No notifications</h3>
+          <p class="text-gray-500">You're all caught up! There are no notifications to display.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-800 text-white py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12 max-w-6xl mx-auto">
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">About Subway</h4>
+          <ul class="space-y-3">
+            <li><a href="story.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Our Story</a></li>
+            <li><a href="nutrition.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Nutrition Information</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Customer Service</h4>
+          <ul class="space-y-3">
+            <li><a href="contact.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Contact Us</a></li>
+            <li><a href="FAS.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Ways to Order</h4>
+          <ul class="space-y-3">
+            <li><a href="Delivery.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Delivery</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Connect With Us</h4>
+          <div class="flex space-x-4 mb-6">
+            <a href="https://www.facebook.com/subwayphilippines/" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-subway-green transition-all duration-300 hover:scale-110">
+              <i class="fab fa-facebook-f text-xl"></i>
+            </a>
+            <a href="https://www.instagram.com/subwayphilippines/?hl=en" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-subway-green transition-all duration-300 hover:scale-110">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-gray-700 text-center text-gray-400">
+        <p class="text-lg">© 2024 Subway® IP LLC. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/notification.js"></script>
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subway | Fresh Sandwiches</title>
+  <link rel="icon" type="image/png" href="pictures/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/home.css">
+</head>
+<body class="font-poppins bg-gray-50">
+  <!-- Shopping Cart Sidebar -->
+  <div id="cart-overlay" class="cart-overlay fixed inset-0 bg-black bg-opacity-50 z-50"></div>
+  
+  <div id="cart-sidebar" class="cart-sidebar fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 overflow-y-auto">
+    <!-- Cart Header -->
+    <div class="bg-subway-green text-white p-6 flex justify-between items-center">
+      <h2 class="text-2xl font-bold">Your Cart</h2>
+      <button id="close-cart" class="text-white hover:text-subway-yellow transition-colors duration-200">
+        <i class="fas fa-times text-2xl"></i>
+      </button>
+    </div>
+    
+    <!-- Cart Items -->
+    <div class="p-6" id="cart-items">
+      <!-- Cart items will be dynamically inserted here -->
+      <div class="text-center py-8" id="empty-cart-message">
+        <i class="fas fa-shopping-cart text-4xl text-gray-300 mb-4"></i>
+        <p class="text-gray-500 text-lg">Your cart is empty</p>
+        <p class="text-gray-400">Add some delicious items to get started!</p>
+      </div>
+    </div>
+    
+    <!-- Cart Footer -->
+    <div class="border-t border-gray-200 p-6 mt-auto">
+      <div class="flex justify-between items-center mb-4">
+        <span class="text-lg font-semibold text-gray-700">Subtotal:</span>
+        <span class="text-xl font-bold text-subway-green" id="cart-subtotal">₱0</span>
+      </div>
+      <div class="flex justify-between items-center mb-6">
+        <span class="text-sm text-gray-500">Delivery fee:</span>
+        <span class="text-sm text-gray-500" id="delivery-fee">₱40</span>
+      </div>
+      <div class="flex justify-between items-center mb-6">
+        <span class="text-lg font-bold text-gray-800">Total:</span>
+        <span class="text-xl font-bold text-subway-green" id="cart-total">₱40</span>
+      </div>
+      <button id="checkout-btn" class="w-full bg-subway-green text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Proceed to Checkout
+      </button>
+      <button id="continue-shopping" class="w-full border border-subway-green text-subway-green py-3 rounded-xl font-bold mt-3 hover:bg-gray-50 transition-colors duration-300">
+        Continue Shopping
+      </button>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-modal" class="modal fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="modal-content bg-white rounded-2xl shadow-2xl max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-center mb-6">
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+            <i class="fas fa-sign-out-alt text-red-500 text-2xl"></i>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-800 text-center mb-4">Logout Confirmation</h3>
+        <p class="text-gray-600 text-lg text-center mb-8">Are you sure you want to logout?</p>
+        <div class="flex space-x-4">
+          <button id="cancel-logout" class="flex-1 border border-gray-300 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors duration-300">
+            Cancel
+          </button>
+          <button id="confirm-logout" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold hover:bg-red-600 transition-colors duration-300">
+            Yes, Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-lg sticky top-0 z-40">
+    <div class="px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center">
+        <img src="pictures/logo.png" alt="Subway Logo" class="h-14 mr-3">
+        <h1 class="font-bold text-3xl text-subway-green">
+          SUB<span class="text-subway-yellow">WAY</span>
+        </h1>
+      </div>
+      
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex space-x-10">
+        <a href="home.html" class="text-xl font-bold text-subway-green border-b-4 border-subway-green pb-2 transition-all duration-300 hover:scale-105">Home</a>
+        <a href="menu.html" class="text-xl font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Menu</a>
+        <a href="promo.html" class="text-xl font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Promos</a>
+        <a href="location.html" class="text-xl font-medium text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-105">Location</a>
+      </nav>
+
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden text-gray-600 text-2xl hover:text-subway-green transition-colors" id="mobile-menu-btn">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <!-- Icons -->
+      <div class="flex items-center space-x-6">
+        <a href="notification.html" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110 relative" id="notification-btn">
+          <i class="fas fa-bell text-2xl"></i>
+          <span class="absolute -top-2 -right-2 bg-red-500 text-white text-sm rounded-full w-6 h-6 flex items-center justify-center" id="notification-count">5</span>
+        </a>
+        <button id="cart-btn" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110 relative">
+          <i class="fas fa-shopping-cart text-2xl"></i>
+          <span class="absolute -top-2 -right-2 bg-subway-green text-white text-sm rounded-full w-6 h-6 flex items-center justify-center" id="cart-count">0</span>
+        </button>
+        
+        <!-- Profile Dropdown Container -->
+        <div class="relative" id="profile-container">
+          <button id="profile-btn" class="text-gray-600 hover:text-subway-green transition-all duration-300 hover:scale-110">
+            <i class="fas fa-user text-2xl"></i>
+          </button>
+          
+          <!-- Profile Dropdown Menu -->
+          <div id="profile-dropdown" class="profile-dropdown absolute right-0 mt-3 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+            <!-- User Info -->
+            <div class="p-4 border-b border-gray-100 bg-gradient-to-r from-subway-green to-green-600 text-white">
+              <div class="flex items-center">
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-subway-green mr-3">
+                  <i class="fas fa-user text-xl"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-lg">Mark John C. Cruz</h3>
+                  <p class="text-green-100 text-sm">mark.cruz@example.com</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dropdown Items -->
+            <div class="py-2">
+              <a href="profile.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <i class="fas fa-user-circle text-subway-green w-6 mr-3 text-center"></i>
+                <span class="font-medium">My Profile</span>
+              </a>
+              <a href="forgot_password.html" class="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 transition-colors duration-200">
+                <i class="fas fa-key text-subway-green w-6 mr-3 text-center"></i>
+                <span class="font-medium">Forgot Password</span>
+              </a>
+              <div class="border-t border-gray-100 my-2"></div>
+              <button id="logout-btn" class="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-50 transition-colors duration-200">
+                <i class="fas fa-sign-out-alt w-6 mr-3 text-center"></i>
+                <span class="font-medium">Logout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden bg-white border-t border-gray-200 hidden" id="mobile-menu">
+      <nav class="flex flex-col p-6 space-y-4">
+        <a href="home.html" class="text-xl font-bold text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Home</a>
+        <a href="menu.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Menu</a>
+        <a href="promo.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 border-b border-gray-100 hover:bg-gray-50 rounded-lg px-4 transition-all">Promos</a>
+        <a href="location.html" class="text-xl font-medium text-gray-600 hover:text-subway-green py-3 hover:bg-gray-50 rounded-lg px-4 transition-all">Location</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative bg-cover bg-center text-white min-h-[80vh] flex items-center" style="background-image: url('https://images.unsplash.com/photo-1571091718767-18b5b1457add?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2072&q=80')">
+    <div class="absolute inset-0 bg-gradient-to-r from-subway-green/90 to-subway-yellow/70"></div>
+    
+    <div class="relative px-2 py-20 flex flex-col lg:flex-row items-center w-full max-w-7xl mx-auto">
+      <div class="w-full lg:w-1/2 mb-12 lg:mb-0 text-center lg:text-left">
+        <h1 class="text-5xl lg:text-6xl font-bold mb-8 leading-tight">Freshly Made,<br>Just For You</h1>
+        <p class="text-2xl mb-10 text-gray-100 leading-relaxed">Customize your perfect sandwich with our wide selection of fresh ingredients.</p>
+        <div class="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+          <button class="bg-white text-subway-green text-xl font-bold py-4 px-10 rounded-2xl hover:bg-subway-yellow hover:text-gray-900 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl animate-pulse-glow">
+            Order for Delivery
+          </button>
+          <button class="bg-transparent border-3 border-white text-white text-xl font-bold py-4 px-10 rounded-2xl hover:bg-subway-yellow hover:text-gray-900 hover:border-subway-yellow transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl outline outline-2 outline-white hover:outline-subway-yellow">
+              Find a Store
+          </button>
+        </div>
+      </div>
+      <div class="w-auto lg:w-1/2 flex justify-center lg:justify-end">
+        <div class="relative w-full max-w-2xl">
+          <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+               alt="Fresh Subway Sandwich" 
+               class="w-full h-96 object-cover rounded-3xl shadow-2xl animate-float transition-transform duration-300 hover:scale-105">
+          <div class="absolute -bottom-6 -right-6 bg-subway-yellow text-gray-800 font-black text-2xl py-4 px-8 rounded-2xl shadow-2xl transform rotate-6 transition-all duration-300 hover:rotate-0 hover:scale-110">
+            Fresh Daily!
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUICK REORDER SECTION -->
+  <section class="py-20 bg-white">
+    <div class="px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold text-subway-green mb-6">Quick Reorder</h2>
+        <p class="text-2xl text-gray-600">Get your favorites in just a few taps</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <!-- Card 1 -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:border-subway-green/30 group">
+          <div class="h-48 bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-6 relative overflow-hidden">
+            <div class="absolute top-4 left-4 bg-subway-green text-white text-base font-black py-2 px-4 rounded-full shadow-lg z-10">
+              BESTSELLER
+            </div>
+            <img src="https://images.unsplash.com/photo-1551782450-17144efb9c50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                 alt="Italian BMT Sandwich" 
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="p-6 bg-gradient-to-b from-white to-gray-50 group-hover:to-green-50 transition-all duration-500">
+            <div class="flex justify-between items-start mb-3">
+              <h3 class="text-xl font-black text-subway-green group-hover:text-green-700 transition-colors">Italian BMT</h3>
+              <div class="flex items-center bg-yellow-100 px-2 py-1 rounded-full">
+                <span class="text-yellow-600 text-sm font-black">★</span>
+                <span class="text-gray-700 text-sm font-bold ml-1">4.8</span>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4 leading-relaxed">Wheat bread, melt cheese, lettuce, tomatoes, onions, mayo</p>
+            <div class="flex justify-between items-center">
+              <div>
+                <h4 class="font-black text-gray-800 text-lg">₱220</h4>
+                <p class="text-gray-500 text-sm flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  15-20 min
+                </p>
+              </div>
+              <button class="add-to-cart-btn bg-gradient-to-r from-subway-green to-green-600 text-white text-sm font-black py-2 px-4 rounded-lg transition-all duration-300 hover:from-subway-yellow hover:to-yellow-500 hover:text-gray-900 hover:scale-105 shadow-lg hover:shadow-xl" 
+                      data-id="1" 
+                      data-name="Italian BMT" 
+                      data-price="220" 
+                      data-image="https://images.unsplash.com/photo-1551782450-17144efb9c50?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card 2 -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:border-subway-green/30 group">
+          <div class="h-48 bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-6 relative overflow-hidden">
+            <div class="absolute top-4 left-4 bg-red-500 text-white text-base font-black py-2 px-4 rounded-full shadow-lg z-10">
+              SPICY
+            </div>
+            <img src="pictures/chicken.jpg" 
+                 alt="Chicken Teriyaki Sandwich" 
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="p-6 bg-gradient-to-b from-white to-gray-50 group-hover:to-green-50 transition-all duration-500">
+            <div class="flex justify-between items-start mb-3">
+              <h3 class="text-xl font-black text-subway-green group-hover:text-green-700 transition-colors">Chicken Teriyaki</h3>
+              <div class="flex items-center bg-yellow-100 px-2 py-1 rounded-full">
+                <span class="text-yellow-600 text-sm font-black">★</span>
+                <span class="text-gray-700 text-sm font-bold ml-1">4.6</span>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4 leading-relaxed">White bread, lettuce, cucumbers, onions, sweet teriyaki sauce</p>
+            <div class="flex justify-between items-center">
+              <div>
+                <h4 class="font-black text-gray-800 text-lg">₱190</h4>
+                <p class="text-gray-500 text-sm flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  15-20 min
+                </p>
+              </div>
+              <button class="add-to-cart-btn bg-gradient-to-r from-subway-green to-green-600 text-white text-sm font-black py-2 px-4 rounded-lg transition-all duration-300 hover:from-subway-yellow hover:to-yellow-500 hover:text-gray-900 hover:scale-105 shadow-lg hover:shadow-xl" 
+                      data-id="2" 
+                      data-name="Chicken Teriyaki" 
+                      data-price="190" 
+                      data-image="https://images.unsplash.com/photo-1606755962773-d324e74534a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card 3 -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:border-subway-green/30 group">
+          <div class="h-48 bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center p-6 relative overflow-hidden">
+            <div class="absolute top-4 left-4 bg-blue-500 text-white text-base font-black py-2 px-4 rounded-full shadow-lg z-10">
+              HEALTHY
+            </div>
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                 alt="Tuna Sandwich" 
+                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="p-6 bg-gradient-to-b from-white to-gray-50 group-hover:to-green-50 transition-all duration-500">
+            <div class="flex justify-between items-start mb-3">
+              <h3 class="text-xl font-black text-subway-green group-hover:text-green-700 transition-colors">Tuna</h3>
+              <div class="flex items-center bg-yellow-100 px-2 py-1 rounded-full">
+                <span class="text-yellow-600 text-sm font-black">★</span>
+                <span class="text-gray-700 text-sm font-bold ml-1">4.7</span>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm mb-4 leading-relaxed">Italian herbs bread, spinach, lettuce, pickles, ranch</p>
+            <div class="flex justify-between items-center">
+              <div>
+                <h4 class="font-black text-gray-800 text-lg">₱179</h4>
+                <p class="text-gray-500 text-sm flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                  15-20 min
+                </p>
+              </div>
+              <button class="add-to-cart-btn bg-gradient-to-r from-subway-green to-green-600 text-white text-sm font-black py-2 px-4 rounded-lg transition-all duration-300 hover:from-subway-yellow hover:to-yellow-500 hover:text-gray-900 hover:scale-105 shadow-lg hover:shadow-xl" 
+                      data-id="3" 
+                      data-name="Tuna" 
+                      data-price="179" 
+                      data-image="https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80">
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMOS SECTION -->
+  <section class="py-20 bg-gray-50">
+    <div class="px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold text-subway-green mb-6">Special Promos & Bundles</h2>
+        <p class="text-2xl text-gray-600">Great deals for the whole family</p>
+      </div>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+        <!-- Promo Card 1 -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:border-subway-green/30 group">
+          <div class="p-2 bg-gradient-to-r from-red-500 to-pink-500">
+            <div class="bg-white p-6 rounded-2xl">
+              <div class="flex flex-col lg:flex-row items-center">
+                <div class="w-full lg:w-2/5 flex items-center justify-center mb-4 lg:mb-0">
+                  <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                         alt="Family Feast Bundle" 
+                         class="w-32 h-32 rounded-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute -top-2 -right-2 bg-red-500 text-white text-base font-black px-3 py-2 rounded-full shadow-lg">
+                      x4
+                    </div>
+                  </div>
+                </div>
+                <div class="w-full lg:w-3/5 lg:pl-6 text-center lg:text-left">
+                  <div class="inline-block bg-red-500 text-white text-base font-black px-4 py-2 rounded-full mb-4 shadow-lg">
+                    Family Bundle
+                  </div>
+                  <h3 class="text-xl font-black text-subway-green mb-4">Family Feast</h3>
+                  <p class="text-gray-600 text-sm mb-4 leading-relaxed">4 Footlong Sandwiches, 4 Cookies, and 4 Drinks</p>
+                  <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
+                    <h4 class="font-black text-gray-800 text-xl">₱899</h4>
+                    <span class="text-gray-500 line-through text-lg">₱1050</span>
+                    <span class="bg-red-100 text-red-600 font-black text-sm px-3 py-1 rounded-full">Save ₱201</span>
+                  </div>
+                  <button class="add-to-cart-btn w-full bg-gradient-to-r from-subway-green to-green-600 text-white text-base font-black py-3 rounded-xl transition-all duration-300 hover:from-subway-yellow hover:to-yellow-500 hover:text-gray-900 hover:scale-105 shadow-lg hover:shadow-xl" 
+                          data-id="4" 
+                          data-name="Family Feast Bundle" 
+                          data-price="899" 
+                          data-image="https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Promo Card 2 -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border-2 border-gray-100 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:border-subway-green/30 group">
+          <div class="p-2 bg-gradient-to-r from-blue-500 to-purple-500">
+            <div class="bg-white p-6 rounded-2xl">
+              <div class="flex flex-col lg:flex-row items-center">
+                <div class="w-full lg:w-2/5 flex items-center justify-center mb-4 lg:mb-0">
+                  <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" 
+                         alt="Weekend Special" 
+                         class="w-32 h-32 rounded-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <div class="absolute -top-2 -right-2 bg-blue-500 text-white text-base font-black px-3 py-2 rounded-full shadow-lg">
+                      x2
+                    </div>
+                  </div>
+                </div>
+                <div class="w-full lg:w-3/5 lg:pl-6 text-center lg:text-left">
+                  <div class="inline-block bg-blue-500 text-white text-base font-black px-4 py-2 rounded-full mb-4 shadow-lg">
+                    Weekend Special
+                  </div>
+                  <h3 class="text-xl font-black text-subway-green mb-4">Buy 1 Take 1</h3>
+                  <p class="text-gray-600 text-sm mb-4 leading-relaxed">Every Saturday and Sunday only</p>
+                  <div class="flex items-center justify-center lg:justify-start mb-4">
+                    <h4 class="font-black text-gray-800 text-xl">₱229</h4>
+                    <span class="ml-4 bg-blue-100 text-blue-600 font-black text-sm px-3 py-1 rounded-full">50% Off</span>
+                  </div>
+                  <button class="add-to-cart-btn w-full bg-gradient-to-r from-subway-green to-green-600 text-white text-base font-black py-3 rounded-xl transition-all duration-300 hover:from-subway-yellow hover:to-yellow-500 hover:text-gray-900 hover:scale-105 shadow-lg hover:shadow-xl" 
+                          data-id="5" 
+                          data-name="Weekend Special" 
+                          data-price="229" 
+                          data-image="https://images.unsplash.com/photo-1551782450-a2132b4ba21d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80">
+                    Add to Cart
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-800 text-white py-16">
+    <div class="container mx-auto px-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12 max-w-6xl mx-auto">
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">About Subway</h4>
+          <ul class="space-y-3">
+            <li><a href="story.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Our Story</a></li>
+            <li><a href="nutrition.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Nutrition Information</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Customer Service</h4>
+          <ul class="space-y-3">
+            <li><a href="contact.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Contact Us</a></li>
+            <li><a href="FAS.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">FAQs</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Ways to Order</h4>
+          <ul class="space-y-3">
+            <li><a href="Delivery.html" class="text-gray-300 text-lg hover:text-white transition-colors hover:translate-x-2 block">Delivery</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-xl font-bold mb-6 text-subway-yellow">Connect With Us</h4>
+          <div class="flex space-x-4 mb-6">
+            <a href="https://www.facebook.com/subwayphilippines/" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-subway-green transition-all duration-300 hover:scale-110">
+              <i class="fab fa-facebook-f text-xl"></i>
+            </a>
+            <a href="https://www.instagram.com/subwayphilippines/?hl=en" class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center hover:bg-subway-green transition-all duration-300 hover:scale-110">
+              <i class="fab fa-instagram text-xl"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-gray-700 text-center text-gray-400">
+        <p class="text-lg">© 2024 Subway® IP LLC. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/home.js"></script>
+</body>
+</html>
